@@ -71,12 +71,29 @@ bot.on('message', msg => {
       msg.channel.send('Боярин!!');
       console.debug('args', args);
       let info = loadInfo(fn, msg).data;
+      info.setTimestamp();
       if(args[1] === 'descr'){
         let idx = msg.content.indexOf('descr')+'descr'.length;
         let descrTxt = msg.content.substring(idx);
         console.debug('rest', descrTxt);
         msg.channel.send('Описаньице!');
         info.setDescription(descrTxt);
+      }else if(args[1] === 'fields'){
+        console.debug('fields');
+        let idx = msg.content.indexOf('fields')+'fields'.length;
+        let fieldsTxt = msg.content.substring(idx);
+        let fieldsArr = fieldsTxt.split(';');
+        console.debug(fieldsTxt, fieldsArr, fieldsArr.length);
+        if (fieldsTxt.trim().length > 0) {
+          console.debug('adding');
+          fieldsArr.forEach((el) => {
+            let f = el.split('|');
+            info.addField(f[0],f[1]);
+          });
+        }else{
+          console.debug('clearing');
+          info.spliceFields(0, info.fields.length);
+        }
       }else{
         msg.channel.send('Незнаемо!');
       }
@@ -109,18 +126,17 @@ bot.on('message', msg => {
       msg.reply('Не знаю о ком сие!');
     }
   } else if (command === 'del') {
-    if (msg.mentions.users.size) {
-      const taggedUser = msg.mentions.users.first();
-      msg.channel.send(`Стираем: ${taggedUser.username}`);
+    if (msg.member.roles.cache.some(role => role.name === 'bot-master')){
       fs.unlink(getFileName(taggedUser.id), (err) => {
         if (err) {
           console.error(err)
         }
         msg.reply('Забыли');
       });
-    } else {
-      msg.reply('Не знаем такого!');
+    }else{
+      msg.channel.send('Не боярин!');
     }
+
   } else if (msg.content.startsWith('!kick')) {
     if (msg.mentions.users.size) {
       const taggedUser = msg.mentions.users.first();
