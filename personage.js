@@ -18,17 +18,17 @@ const infoTemplate = {
 
 class PersonageInfo {
   constructor(userId){
-    console.debug('Creating new userinfo instance for '+userId);
+    //console.debug('Creating new userinfo instance for '+userId);
     this.props = []; //Allowed properties?
     this.fn = sdir+'/usrV2_' + userId  + '.json';
     if(fs.existsSync(this.fn)){
-      console.debug('V2 file exists');
+      //console.debug('V2 file exists');
       this.obj = JSON.parse(fs.readFileSync(this.fn));
     }else{
-      console.debug('V2 file not exists');
+      //console.debug('V2 file not exists');
       this.obj = null;
     }
-    console.debug('V2 obj ',this.obj);
+    //console.debug('V2 obj ',this.obj);
   }
   /* Translate object into embed*/
   message(){
@@ -37,9 +37,8 @@ class PersonageInfo {
       msg.setDescription('V2 - в процессе');
       msg.setAuthor("Валенсия");
       if(this.obj.descr) msg.setDescription(this.obj.descr);
-
-      this.obj.fields.forEach((el)=>{
-        msg.addField(el.name, el.value);
+      Object.keys(this.obj.fields).forEach((key)=>{
+        msg.addField(key, this.obj.fields[key]);
       });
 
       msg.setFooter('© Лаборатория Техномага');
@@ -54,8 +53,8 @@ class PersonageInfo {
       this.obj.descr = value;
       return
      } //Temporary solution, description will be defined by game
-    if(!this.obj.fields) this.obj.fields = [];
-    this.obj.fields.push({name: name, value: value});
+    if(!this.obj.fields) this.obj.fields = {};
+    this.obj.fields[name] = value;
   }
   save(cb){
     let dat = JSON.stringify(this.obj);
