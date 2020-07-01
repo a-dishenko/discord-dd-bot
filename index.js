@@ -3,57 +3,25 @@ const fs = require('fs');
 const Discord = require('discord.js');
 const bot = new Discord.Client();
 
+const PersonageInfo = require('./personage.js')
 
 const prefix = process.env.PREFIX;
+const sdir = process.env.SDIR;
 const TOKEN = process.env.TOKEN;
 
-const getBoyarInfo = function(){
-  var bi = new Discord.MessageEmbed();
-  bi.setColor('#0099ff')
-  .setTitle('Боярская инфа')
-  .setDescription('Боярин сей многими свойствами обладает')
-  .addFields(
-		{ name: 'Характер', value: 'Нордический' },
-    { name: 'Уменья', value: 'Космические'})
-  .setTimestamp()
-  .setFooter('Многие лета!');
-  return bi;
-};
 
-function getFileName(id){
-  return './savedInfo/usr' + id + '.json';
-}
-
-function saveInfo(fname, dat, msg){
-  fs.writeFile(fname, dat , function (err,data) {
-    if(err){
-        msg.channel.send('File writing error');
-    }else{
-        msg.channel.send('Success!');
-    }
-  });
-}
-
-function loadInfo(fname, msg, cb){
-  var boyarInfo = new Discord.MessageEmbed(),
-      is_new = true;
-  if(fs.existsSync(fname)){
-    msg.channel.send(`О нём нам ведомо!`);
-    let data = JSON.parse(fs.readFileSync(fname));
-    console.debug('data', data);
-    boyarInfo = new Discord.MessageEmbed(data);
-    is_new = false;
-    console.debug('boyarInfo', boyarInfo);
-  }else{
-    msg.channel.send(`О нём не знаем!`);
-  }
-  return { data: boyarInfo, is_new: is_new }
-}
-
+/*START*/
 bot.login(TOKEN);
 
 bot.on('ready', () => {
   console.info(`Logged in as ${bot.user.tag}!`);
+  if(fs.existsSync(sdir)){
+    console.info('Service directory exists '+sdir);
+  }else{
+    console.info('Creating service directory '+sdir);
+    fs.mkdirSync(sdir);
+    console.info('Done!');
+  }
 });
 
 bot.on('message', msg => {
@@ -61,23 +29,22 @@ bot.on('message', msg => {
   console.debug('go');
   if (msg.mentions.users.size != 1) return;
   const taggedUser = msg.mentions.users.first();
-  const fn = getFileName(taggedUser.id);
   const args = msg.content.slice(prefix.length).split(/ +/);
   const command = args.shift().toLowerCase();
+  const personage = new PersonageInfo(taggedUser.id);
 
   if (command === 'set') {
     msg.reply('Боярин ли?');
     if (msg.member.roles.cache.some(role => role.name === 'bot-master')){
       msg.channel.send('Боярин!!');
       console.debug('args', args);
-      let info = loadInfo(fn, msg).data;
-      info.setTimestamp();
+
       if(args[1] === 'descr'){
         let idx = msg.content.indexOf('descr')+'descr'.length;
         let descrTxt = msg.content.substring(idx);
         console.debug('rest', descrTxt);
         msg.channel.send('Описаньице!');
-        info.setDescription(descrTxt);
+        personage.set('descr', descrTxt);
       }else if(args[1] === 'fields'){
         console.debug('fields');
         let idx = msg.content.indexOf('fields')+'fields'.length;
@@ -88,61 +55,33 @@ bot.on('message', msg => {
           console.debug('adding');
           fieldsArr.forEach((el) => {
             let f = el.split('|');
-            info.addField(f[0],f[1]);
+            personage.set(f[0],f[1]);
           });
         }else{
           console.debug('clearing');
-          info.spliceFields(0, info.fields.length);
+          //Нужна ли очистка?
         }
       }else{
-        msg.channel.send('Незнаемо!');
+        msg.channel.send('Неизвестная команда!');
       }
 
-      msg.channel.send(`Запоминаем о: ${taggedUser.username}`);
-      /*
-      const tmp = new Discord.MessageEmbed(data.data).setColor('#0099ff')
-      .setTitle('Боярская инфа')
-      .setDescription('Боярин сей многими свойствами обладает')
-      .addFields({name: 'Характер', value: 'Стоический'},{name: 'Возраст', value: 'Преклонный'}); */
-      const dt = JSON.stringify(info);
-      saveInfo(fn, dt, msg);
-    }else{
-      msg.channel.send('Не боярин!');
-    }
-  } else if (command === 'get') {
-    if (msg.mentions.users.size) {
-      const taggedUser = msg.mentions.users.first();
-      msg.channel.send(`Вопрошаешь о: ${taggedUser.username}`);
-      try{
-        let data = loadInfo(fn, msg);
-        if(!data.is_new){
-          msg.channel.send(data.data)
-        }
-      } catch(err) {
-        console.error(err);
-      }
+      msg.channel.send(`Запоминаем V2 о: ${taggedUser.username}`);
 
-    } else {
-      msg.reply('Не знаю о ком сие!');
-    }
-  } else if (command === 'del') {
-    if (msg.member.roles.cache.some(role => role.name === 'bot-master')){
-      fs.unlink(getFileName(taggedUser.id), (err) => {
-        if (err) {
-          console.error(err)
-        }
-        msg.reply('Забыли');
+      personage.save(() => {
+          msg.channel.send('Запомнили V2')
       });
     }else{
       msg.channel.send('Не боярин!');
     }
-
-  } else if (msg.content.startsWith('!kick')) {
-    if (msg.mentions.users.size) {
-      const taggedUser = msg.mentions.users.first();
-      msg.channel.send(`You wanted to kick: ${taggedUser.username}`);
-    } else {
-      msg.reply('Please tag a valid user!');
+  } else if (command === 'get') {
+    msg.channel.send(personage.message());
+  } else if (command === 'del') {
+    if (msg.member.roles.cache.some(role => role.name === 'bot-master')){
+      personage.delete(()=>{
+        msg.channel.send('Забыли версию 2');
+      });
+    }else{
+      msg.channel.send('Не боярин!');
     }
   }
 });
