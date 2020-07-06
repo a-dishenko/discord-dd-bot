@@ -6,6 +6,9 @@ const bot = new Discord.Client();
 const PersonageInfo = require('./personage.js'); //File Based Object
 
 const mongoose = require('mongoose');
+mongoose.set('useCreateIndex', true);
+const Schema = mongoose.Schema;
+
 const uri = "mongodb+srv://discord-dd-bot:wCJ3%24f%23-qRTPXL.@cluster0.bv3jq.mongodb.net/test?retryWrites=true&w=majority&useUnifiedTopology=true";
 
 mongoose.connect(uri, {useNewUrlParser: true, useUnifiedTopology: true});
@@ -15,7 +18,14 @@ db.once('open', function() {
   console.debug('We have connection!');
 });
 
-const Game = mongoose.model('Game', { name: String, description: String });
+const GameShema = new Schema({
+  name: {
+    type: String,
+    unique: true
+  },
+  description: String
+});
+const Game = mongoose.model('Game', GameShema);
 
 
 const prefix = process.env.PREFIX;
@@ -41,9 +51,6 @@ bot.login(TOKEN);
 
 bot.on('ready', () => {
   console.info(`Logged in as ${bot.user.tag}!`);
-
-
-
 
   if(fs.existsSync(sdir)){
     console.info('Service directory exists '+sdir);
