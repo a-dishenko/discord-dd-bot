@@ -4,37 +4,37 @@ const Discord = require('discord.js');
 const bot = new Discord.Client();
 
 const PersonageInfo = require('./personage.js'); //File Based Object
+const {GameShema, PersonageSchema} = require('./schemas.js');
 
 const mongoose = require('mongoose');
-mongoose.set('useCreateIndex', true);
-const Schema = mongoose.Schema;
-
-const uri = "mongodb+srv://discord-dd-bot:wCJ3%24f%23-qRTPXL.@cluster0.bv3jq.mongodb.net/test?retryWrites=true&w=majority&useUnifiedTopology=true";
-
-mongoose.connect(uri, {useNewUrlParser: true, useUnifiedTopology: true});
-const db = mongoose.connection;
-db.on('error', console.error.bind(console, 'connection error:'));
-db.once('open', function() {
-  console.debug('We have connection!');
-});
-
-const GameShema = new Schema({
-  name: {
-    type: String,
-    unique: true
-  },
-  description: String
-});
-const Game = mongoose.model('Game', GameShema);
-
 
 const prefix = process.env.PREFIX;
 const sdir = process.env.SDIR;
 const TOKEN = process.env.TOKEN;
+const db_uri = process.env.DB_URI;
+
+mongoose.set('useCreateIndex', true);
+
+mongoose.connect(db_uri, {useNewUrlParser: true, useUnifiedTopology: true});
+const db = mongoose.connection;
+db.on('error', console.error.bind(console, 'connection error:'));
+db.once('open', function() {
+  console.log('We have connection! ', db_uri);
+});
+
+const Game = mongoose.model('Game', GameShema);
+const PersonageModel = mongoose.model('PersonageModel', PersonageSchema);
+
+console.debug(PersonageModel);
 
 /*Prepare*/
 bot.commands = new Discord.Collection();
 bot.db = db;
+bot.GameShema = GameShema;
+bot.PersonageSchema = PersonageSchema;
+bot.GameModel = Game;
+bot.PersonageModel = PersonageModel;
+
 fs.readdir("./commands/", (err, files) => {
   if (err) return console.log(err);
   files.forEach(file => {
@@ -67,16 +67,14 @@ bot.on('message', msg => {
   let msgStr = msg.content;
   const taggedUser = msg.mentions.users.first();
   if(taggedUser){
+    msg.PID = taggedUser.id;
     msg.personage = new PersonageInfo(taggedUser.id);
     msgStr = msg.content.replace('<@!'+taggedUser.id+'>','');
   }
-  msg.Game = Game;
   const args = msgStr.slice(prefix.length).split(/ +/);
   const command = args.shift().toLowerCase();
   const commandfile = bot.commands.get(command);
-  console.debug(taggedUser, args);
-
-
+  //console.debug(taggedUser, args);
 
   if(commandfile) commandfile.run(bot, msg, args);
 });
