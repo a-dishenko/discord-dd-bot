@@ -1,24 +1,7 @@
 const fs = require('fs');
 const Discord = require('discord.js');
-/*const MongoClient = require('mongodb').MongoClient; */
-
-/*
-const Cat = mongoose.model('Cat', { name: String });
-
-const kitty = new Cat({ name: 'Zildjian' });
-kitty.save().then(() => console.log('meow')); */
 var dbHandler;
-/*
-MongoClient.connect(uri, function(err, client) {
-  // Use the admin database for the operation
-  console.debug('err', err);
-  var adminDb = client.db().admin();
-  var db = client.db('mainDB');
-  dbHandler = db;
-  var games = db.collection('games');
-  var personages = db.collection('personages');
-});
-*/
+
 
 const sdir = process.env.SDIR;
 

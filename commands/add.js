@@ -20,4 +20,5 @@ exports.run = (client, msg, args) => {
   }else{
     msg.channel.send('Не боярин!');
   }
-}
+};
+exports.shortDescr = 'Добавить новую игру';

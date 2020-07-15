@@ -25,13 +25,9 @@ db.once('open', function() {
 const Game = mongoose.model('Game', GameShema);
 const PersonageModel = mongoose.model('PersonageModel', PersonageSchema);
 
-console.debug(PersonageModel);
-
 /*Prepare*/
 bot.commands = new Discord.Collection();
 bot.db = db;
-bot.GameShema = GameShema;
-bot.PersonageSchema = PersonageSchema;
 bot.GameModel = Game;
 bot.PersonageModel = PersonageModel;
 

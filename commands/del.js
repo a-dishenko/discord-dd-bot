@@ -2,12 +2,12 @@ exports.run = (client, msg, args) => {
 
   const GM = client.GameModel;
 
-
   if (msg.member.roles.cache.some(role => role.name === 'bot-master')){
     const subCommand = args.shift();
     if(subCommand === 'game'){
       const gname = args.join(' ');
       msg.channel.send('Дропаем игру "'+gname+'"');
+      //Надо удалить всех привязаных персонажей этой игры
       GM.deleteOne({name: gname},(err)=>{
         if(err){
           console.debug(err)
@@ -23,4 +23,5 @@ exports.run = (client, msg, args) => {
   }else{
     msg.channel.send('Не боярин!');
   }
-}
+};
+exports.shortDescr = 'Удалить игру';
