@@ -22,4 +22,5 @@ exports.run = (client, msg, args) => {
     console.debug('else');
     msg.channel.send(msg.personage.message());
   }
-}
+};
+exports.shortDescr = 'Выдать информацию по персонажу в одной из игр';

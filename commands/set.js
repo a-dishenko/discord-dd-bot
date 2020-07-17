@@ -88,4 +88,6 @@ exports.run = (client, msg, args) => {
   }else{
     msg.channel.send('Не боярин!');
   }
-}
+};
+exports.shortDescr = 'Сохранить информацию по игровому персонажу';
+exports.fullDescr = 'dd!set @пользователь g[номер игры] [строка параметров]';

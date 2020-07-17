@@ -7,7 +7,7 @@ exports.run = (client, msg, args) => {
      "title":"DnD помогатель",
      "type":"rich",
      "description": 'Бот позволяет сохранять и получать информацию об игровых персонажах в различных игровых сессиях.'+
-     ' Для подробной информации о команде используйте dd!help [имя команды]',
+     '\n Для подробной информации о команде используйте dd!help [имя команды]',
      "timestamp":null,
      "color":'BLUE',
      "fields":[],
@@ -25,7 +25,8 @@ exports.run = (client, msg, args) => {
    });
    msg.reply(response);
   }else{
-    msg.reply('Ожидайте!');
+    const fullHelp = client.commands[subCommand] || 'Нет подробного описания';
+    msg.reply(fullHelp);
   }
 };
 exports.shortDescr = 'Эта команда';
