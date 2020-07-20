@@ -25,8 +25,18 @@ exports.run = (client, msg, args) => {
    });
    msg.reply(response);
   }else{
-    const fullHelp = client.commands[subCommand] || 'Нет подробного описания';
-    msg.reply(fullHelp);
+    if(!client.commands.has(subCommand)){
+      msg.channel.send('Неизвестная команда: '+subCommand);
+      return;
+    }
+    const cmd = client.commands.get(subCommand);
+    let fullHelp = cmd.fullDescr;
+    if(fullHelp){
+      fullHelp = 'Подробное описание команды '+subCommand+'\n' + fullHelp;
+    }else{
+       fullHelp = 'Нет подробного описания';
+    }
+    msg.channel.send(fullHelp);
   }
 };
 exports.shortDescr = 'Эта команда';

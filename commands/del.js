@@ -25,3 +25,4 @@ exports.run = (client, msg, args) => {
   }
 };
 exports.shortDescr = 'Удалить игру';
+exports.fullDescr = 'dd!del game [номер игры] \nВНИМАНИЕ! Удалятся также ВСЕ персонажи созданные для данной игры!';

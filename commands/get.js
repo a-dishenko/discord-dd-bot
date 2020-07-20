@@ -3,7 +3,6 @@ exports.run = (client, msg, args) => {
   const subCommand = args.shift();
   const GM = client.GameModel;
   const PM = client.PersonageModel;
-  console.debug('args', args);
 
   if(subCommand == 'g') {
     const i = args.shift(); //game index
@@ -19,8 +18,10 @@ exports.run = (client, msg, args) => {
     });
 
   }else{
-    console.debug('else');
-    msg.channel.send(msg.personage.message());
+    console.debug('else ',this);
+      msg.channel.send('Неизвестный пользователь или игра');
+    //msg.channel.send(msg.personage.message());
   }
 };
 exports.shortDescr = 'Выдать информацию по персонажу в одной из игр';
+exports.fullDescr = 'dd!get @[пользователь] g [номер игры] \nСписок игр их номеров можно получить командой dd!games';

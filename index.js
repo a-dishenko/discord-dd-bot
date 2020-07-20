@@ -18,9 +18,10 @@ mongoose.set('useCreateIndex', true);
 mongoose.connect(db_uri, {useNewUrlParser: true, useUnifiedTopology: true});
 const db = mongoose.connection;
 db.on('error', console.error.bind(console, 'connection error:'));
-db.once('open', function() {
-  console.log('We have connection! ', db_uri);
-});
+db.once('open', () => {
+    console.log('We have connection! ', db_uri);
+  }
+);
 
 const Game = mongoose.model('Game', GameShema);
 const PersonageModel = mongoose.model('PersonageModel', PersonageSchema);
