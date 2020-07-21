@@ -22,21 +22,7 @@ const GameShema = new Schema({
   },
   description: String
 });
-GameShema.static('getByIndex', function(i, cb) {
-  i = parseInt(i);
-  return this.find().then((r)=>{
-    if(r.length < (i+1)) {
-      console.log('Неизвестная игра');
-      cb();
-    }else{
-      const game = r[i];
-      console.log('Нашли игру: '+game.name);
-      cb(r[i]);
-    }
-  },()=>{
-    cb();
-  });
-});
+
 const PersonageSchema = new Schema({
   userId: {
     type: String, /*Discord ID*/
@@ -53,6 +39,37 @@ const PersonageSchema = new Schema({
   }
 });
 
+//Получить список игр пользователя
+GameShema.static('findByUser', async function(uid, PS, cb){
+  const userPersonages = await PS.find({userId: uid});
+  let myGames = [];
+  await userPersonages.forEach(async el=>{
+    //console.debug('     el',el);
+    let game = await this.findById(el.gameId);
+    myGames.push(game);
+  });
+  console.debug('myGames -----', myGames);
+  cb(myGames);
+});
+
+// Получить игру по номеру
+GameShema.static('getByIndex', function(i, cb) {
+  i = parseInt(i);
+  return this.find().then((r)=>{
+    if(r.length < (i+1)) {
+      console.log('Неизвестная игра');
+      cb();
+    }else{
+      const game = r[i];
+      console.log('Нашли игру: '+game.name);
+      cb(r[i]);
+    }
+  },()=>{
+    cb();
+  });
+});
+
+
 PersonageSchema.static('getByGame', function(pid, gid, cb) {
   this.findOne({userId: pid, gameId: gid }).then(r=>{
     console.debug('SUCCESS');
@@ -60,6 +77,14 @@ PersonageSchema.static('getByGame', function(pid, gid, cb) {
   },err=>{
     console.debug('FAIL', err);
   });
+});
+
+PersonageSchema.static('findMyGames', async function(uid, cb){
+  const allGames = await this.find();
+  const userPersonages = await PersonageSchema.find({userId: uid});
+  console.debug(allGames);
+  console.debug('UP', userPersonages);
+  cb();
 });
 
 PersonageSchema.method('getEmbed', function(gameObj) {

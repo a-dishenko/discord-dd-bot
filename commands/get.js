@@ -4,10 +4,13 @@ exports.run = (client, msg, args) => {
   const GM = client.GameModel;
   const PM = client.PersonageModel;
 
+  if(!msg.PID){
+    msg.channel.send('Укажите пользователя');
+    return;
+  }
   if(subCommand == 'g') {
     const i = args.shift(); //game index
     GM.getByIndex(i, gameObj=>{
-      //msg.channel.send(msg.reply(gameObj.name));
       PM.getByGame(msg.PID, gameObj._id, p => {
         //console.debug('personage2', p);
         //console.debug(p.getEmbed(gameObj));
@@ -18,9 +21,12 @@ exports.run = (client, msg, args) => {
     });
 
   }else{
-    console.debug('else ',this);
-      msg.channel.send('Неизвестный пользователь или игра');
-    //msg.channel.send(msg.personage.message());
+    msg.channel.send('Игра не указана');
+    GM.findByUser(msg.PID, PM, (games)=>{
+      console.debug('G ', games);
+      myGameNames = games.map(g => g.name);
+      msg.channel.send('У пользователя есть персонажи в играх: ' + myGameNames.join(', '));
+    });
   }
 };
 exports.shortDescr = 'Выдать информацию по персонажу в одной из игр';

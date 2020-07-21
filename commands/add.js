@@ -2,7 +2,6 @@ exports.run = (client, msg, args) => {
   const GM = client.GameModel;
 
   if (msg.member.roles.cache.some(role => role.name === 'bot-master')){
-    console.debug('args', args);
     const gameName = args.join(' ');
     msg.channel.send('Добавляем игру '+gameName);
     const g = new GM({name: gameName, description: 'TEST TEST TEST'});
