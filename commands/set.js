@@ -44,10 +44,19 @@ exports.run = (client, msg, args) => {
           });
         } else {
           msg.reply('Персонаж то уже есть! Апдейтим.');
+          console.debug('fieldsStr', fieldsStr);
           fieldsStr.split(';').forEach((el) => {
-            console.debug('adding');
             let f = el.split('|');
+            console.debug('adding ',f);
             personage2.fields.set(f[0],f[1]);
+          });
+          personage2.save((err, game)=>{
+            if(err) {
+              console.error(err);
+              msg.channel.send('Что то пошло не так');
+            }else{
+              msg.channel.send('Апдейт готовъ');
+            }
           });
         }
       });

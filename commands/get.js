@@ -12,14 +12,11 @@ exports.run = (client, msg, args) => {
     const i = args.shift(); //game index
     GM.getByIndex(i, gameObj=>{
       PM.getByGame(msg.PID, gameObj._id, p => {
-        //console.debug('personage2', p);
-        //console.debug(p.getEmbed(gameObj));
         msg.channel.send(p.getEmbed(gameObj));
         return;
       });
       return;
     });
-
   }else{
     msg.channel.send('Игра не указана');
     GM.findByUser(msg.PID, PM, (games)=>{
@@ -34,5 +31,6 @@ exports.run = (client, msg, args) => {
     });
   }
 };
+
 exports.shortDescr = 'Выдать информацию по персонажу в одной из игр';
 exports.fullDescr = 'dd!get @[пользователь] g [номер игры] \nСписок игр их номеров можно получить командой dd!games';
