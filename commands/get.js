@@ -23,9 +23,14 @@ exports.run = (client, msg, args) => {
   }else{
     msg.channel.send('Игра не указана');
     GM.findByUser(msg.PID, PM, (games)=>{
-      console.debug('G ', games);
       myGameNames = games.map(g => g.name);
-      msg.channel.send('У пользователя есть персонажи в играх: ' + myGameNames.join(', '));
+      let rtext = 'У пользователя ';
+      if(myGameNames.length > 0){
+        rtext += ('есть персонажи в играх: ' + myGameNames.join(', '));
+      }else{
+        rtext += 'нет игровых персонажей ни в одной игре';
+      }
+      msg.channel.send(rtext);
     });
   }
 };

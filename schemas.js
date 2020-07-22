@@ -41,14 +41,11 @@ const PersonageSchema = new Schema({
 
 //Получить список игр пользователя
 GameShema.static('findByUser', async function(uid, PS, cb){
-  const userPersonages = await PS.find({userId: uid});
   let myGames = [];
-  await userPersonages.forEach(async el=>{
-    //console.debug('     el',el);
-    let game = await this.findById(el.gameId);
+  for await (const pers of PS.find({userId: uid})) {
+    let game = await this.findById(pers.gameId);
     myGames.push(game);
-  });
-  console.debug('myGames -----', myGames);
+  }
   cb(myGames);
 });
 
